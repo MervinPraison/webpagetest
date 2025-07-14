@@ -1,4 +1,5 @@
 <?php
+
 // Copyright 2020 Catchpoint Systems Inc.
 // Use of this source code is governed by the Polyform Shield 1.0.0 license that can be
 // found in the LICENSE.md file.
@@ -13,12 +14,13 @@ $page_description = "Website performance optimization tips.";
         <meta http-equiv="charset" content="iso-8859-1">
         <meta name="keywords" content="Performance, Optimization, Pagetest, Page Design, performance site web, internet performance, website performance, web applications testing, web application performance, Internet Tools, Web Development, Open Source, http viewer, debugger, http sniffer, ssl, monitor, http header, http header viewer">
         <meta name="description" content="Speed up the performance of your web pages with an automated analysis">
-        <meta name="author" content="Patrick Meenan">
-        <?php $gaTemplate = 'Tips'; include ('head.inc'); ?>
-        <style type="text/css">
+        <?php include('head.inc'); ?>
+        <style>
         .tip {
-            margin-bottom: 3em;
-            </style>
+            padding: 3rem;
+            margin: 3em;
+        }
+        </style>
     </head>
     <body>
             <?php
@@ -33,15 +35,13 @@ $page_description = "Website performance optimization tips.";
             if ($active_tips) {
                 $active_tips = explode(" ", $active_tips);
             }
-            foreach( $files as $file )
-            {
+            foreach ($files as $file) {
                 if (!$active_tips || in_array(basename($file), $active_tips)) {
                     $tip = file_get_contents($file);
-                    if( strlen($tip) )
-                    {
-                        echo '<table class="tip"><tr><th>Did you know...</th></tr><tr><td>';
+                    if (strlen($tip)) {
+                        echo '<div class="tip box"><div class="tipHead"><h2>Did you know?</h2><span class="tip_note">(all links open in a new window/tab)</span></div>';
                         echo $tip;
-                        echo "</td></table>\n";
+                        echo "</div>\n";
                     }
                 }
             }

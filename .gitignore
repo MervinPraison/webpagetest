@@ -40,6 +40,7 @@ agent/js/lib/ios/DeviceSupport
 /www/installers/browsers/nightly.dat
 /www/cli/archive-ia.php
 /www/cli/ec2-keys.inc.php
+/www/15
 
 agent/js/5c.sh
 
@@ -48,6 +49,7 @@ agent/js/5c.sh
 agent/js/5c2.sh
 /*.sublime-project
 /*.sublime-workspace
+/*.code-workspace
 /www/dat
 /www/settings/uniqueId.dat
 /www/ec2/log
@@ -86,7 +88,7 @@ agent/webdriver/out/1.0.histograms.json.gz
 agent/wptdriver/Registry.pol
 www/gce.php
 
-# docker 
+# docker
 docker/local/results/*
 !docker/local/results/.gitkeep
 
@@ -106,7 +108,6 @@ www/.vscode/launch.json
 www/settings/getkey.html
 www/forums
 www/settings/custom_metrics/iframeCount.js
-www/settings/custom_metrics/meta-viewport.js
 .gitignore
 www/settings/custom_metrics/scriptTagCount.js
 www/settings/common
@@ -114,3 +115,10 @@ www/settings/server
 www/robots.txt
 
 tests/*.cache
+www/beanstalk.php
+.vscode/*
+*/.vscode/*
+vendor/bin/.phpunit.result.cache
+
+# developer settings
+www/dev.php

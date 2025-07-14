@@ -1,14 +1,15 @@
 <?php
+
 // Copyright 2020 Catchpoint Systems Inc.
 // Use of this source code is governed by the Polyform Shield 1.0.0 license that can be
 // found in the LICENSE.md file.
-header ("Content-type: image/png");
+header("Content-type: image/png");
 include 'common.inc';
-require_once __DIR__ . '/object_detail.inc';
-require_once __DIR__ . '/page_data.inc';
-require_once __DIR__ . '/waterfall.inc';
-require_once __DIR__ . '/include/TestInfo.php';
-require_once __DIR__ . '/include/TestStepResult.php';
+require_once INCLUDES_PATH . '/object_detail.inc';
+require_once INCLUDES_PATH . '/page_data.inc';
+require_once INCLUDES_PATH . '/waterfall.inc';
+require_once INCLUDES_PATH . '/include/TestInfo.php';
+require_once INCLUDES_PATH . '/include/TestStepResult.php';
 
 // not functional, but to declare what to expect from common.inc
 global $testPath, $run, $cached, $step, $id, $url, $test;
@@ -29,43 +30,46 @@ $rowcount = array_key_exists('rowcount', $_REQUEST) ? $_REQUEST['rowcount'] : 0;
 $requests = $testStepResult->getRequests();
 
 if ($include_js) {
-  $localPaths = new TestPaths($testInfo->getRootDirectory(), $run, $cached, $step);
-  AddRequestScriptTimings($requests, $localPaths->devtoolsScriptTimingFile());
+    $localPaths = new TestPaths($testInfo->getRootDirectory(), $run, $cached, $step);
+    AddRequestScriptTimings($requests, $localPaths->devtoolsScriptTimingFile());
 }
 
 if (@$_REQUEST['type'] == 'connection') {
-  $is_state = true;
-  $include_js = false;
-  $include_wait = false;
-  $rows = GetConnectionRows($requests, $show_labels);
+    $is_state = true;
+    $include_js = false;
+    $include_wait = false;
+    $rows = GetConnectionRows($requests, $show_labels);
 } else {
-  $rows = GetRequestRows($requests, $use_dots, $show_labels);
+    $rows = GetRequestRows($requests, $use_dots, $show_labels);
 }
 $page_events = GetPageEvents($testStepResult->getRawResults());
-$bwIn=0;
+$bwIn = 0;
 if (isset($test) && is_array($test) && isset($test['testinfo']['bwIn'])) {
-  $bwIn = $test['testinfo']['bwIn'];
-} else if(isset($test) && is_array($test) && isset($test['test']['bwIn'])) {
-  $bwIn = $test['test']['bwIn'];
+    $bwIn = $test['testinfo']['bwIn'];
+} elseif (isset($test) && is_array($test) && isset($test['test']['bwIn'])) {
+    $bwIn = $test['test']['bwIn'];
 }
 
 $options = array(
-  'id' => $id,
-  'path' => $testPath,
-  'run_id' => $run,
-  'is_cached' => $cached,
-  'step_id' => $step,
-  'use_cpu' =>     (!isset($_REQUEST['cpu'])    || $_REQUEST['cpu'] != 0),
-  'use_bw' =>      (!isset($_REQUEST['bw'])     || $_REQUEST['bw'] != 0),
-  'show_labels' => $show_labels,
-  'show_chunks' => $show_chunks,
-  'max_bw' => $bwIn,
-  'is_mime' => $is_mime,
-  'is_state' => $is_state,
-  'include_js' => $include_js,
-  'include_wait' => $include_wait,
-  'show_user_timing' => (isset($_REQUEST['ut']) ? $_REQUEST['ut'] : GetSetting('waterfall_show_user_timing')),
-  'rowcount' => $rowcount
+    'id' => $id,
+    'path' => $testPath,
+    'run_id' => $run,
+    'is_cached' => $cached,
+    'step_id' => $step,
+    'use_cpu' => (!isset($_REQUEST['cpu']) || $_REQUEST['cpu'] != 0),
+    'use_bw' => (!isset($_REQUEST['bw']) || $_REQUEST['bw'] != 0),
+    'use_lt' => (!isset($_REQUEST['lt']) || $_REQUEST['lt'] != 0),
+    'show_labels' => $show_labels,
+    'show_chunks' => $show_chunks,
+    'max_bw' => $bwIn,
+    'is_mime' => $is_mime,
+    'is_state' => $is_state,
+    'include_js' => $include_js,
+    'include_wait' => $include_wait,
+    'show_user_timing' => (isset($_REQUEST['ut']) ? $_REQUEST['ut'] : GetSetting('waterfall_show_user_timing')),
+    'rowcount' => $rowcount,
+    'min' => isset($_REQUEST['min']) ? $_REQUEST['min'] : 0,
+    'max' => isset($_REQUEST['max']) ? $_REQUEST['max'] : null
 );
 
 $url = $testStepResult->readableIdentifier($url);
@@ -75,8 +79,7 @@ $im = GetWaterfallImage($rows, $url, $page_events, $options, $pageData);
 
 // Spit the image out to the browser.
 header('Last-Modified: ' . gmdate('r'));
-header('Expires: '.gmdate('r', time() + 31536000));
+header('Expires: ' . gmdate('r', time() + 31536000));
 header('Cache-Control: public, max-age=31536000', true);
 imagepng($im);
 imagedestroy($im);
-?>

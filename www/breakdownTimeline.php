@@ -1,10 +1,11 @@
 <?php
+
 // Copyright 2020 Catchpoint Systems Inc.
 // Use of this source code is governed by the Polyform Shield 1.0.0 license that can be
 // found in the LICENSE.md file.
 include 'common.inc';
 require_once('breakdown.inc');
-require_once('contentColors.inc');
+require_once INCLUDES_PATH . '/include/contentColors.inc';
 require_once('waterfall.inc');
 require_once('page_data.inc');
 
@@ -18,8 +19,8 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
         <title><?php echo $page_title; ?> - WebPageTest Content Breakdown</title>
         <script>document.documentElement.classList.add('has-js');</script>
 
-        <?php $gaTemplate = 'Content Breakdown'; include ('head.inc'); ?>
-       
+        <?php include('head.inc'); ?>
+
     </head>
     <body class="result">
             <?php
@@ -28,71 +29,84 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
             include 'header.inc';
             $processing = GetDevToolsCPUTime($testPath, $run, $cached);
             if (isset($processing)) {
-              arsort($processing);
-              $mapping = array('EvaluateScript' => 'Scripting',
-                               'v8.compile' => 'Scripting',
+                arsort($processing);
+                $mapping = array('EvaluateScript' => 'Scripting',
+                               'EventDispatch' => 'Scripting',
+                               'FireAnimationFrame' => 'Scripting',
+                               'FireAnimationFrame' => 'Scripting',
                                'FunctionCall' => 'Scripting',
                                'GCEvent' => 'Scripting',
+                               'Heap::collectGarbage' => 'Scripting',
+                               'HitTest' => 'Scripting',
+                               'IntersectionObserverController::computeIntersections' => 'Scripting',
+                               'MajorGC' => 'Scripting',
+                               'MinorGC' => 'Scripting',
+                               'ThreadState::completeSweep' => 'Scripting',
+                               'ThreadState::performIdleLazySweep' => 'Scripting',
                                'TimerFire' => 'Scripting',
-                               'EventDispatch' => 'Scripting',
                                'TimerInstall' => 'Scripting',
                                'TimerRemove' => 'Scripting',
                                'XHRLoad' => 'Scripting',
                                'XHRReadyStateChange' => 'Scripting',
-                               'MinorGC' => 'Scripting',
-                               'MajorGC' => 'Scripting',
-                               'FireAnimationFrame' => 'Scripting',
-                               'ThreadState::completeSweep' => 'Scripting',
-                               'Heap::collectGarbage' => 'Scripting',
-                               'ThreadState::performIdleLazySweep' => 'Scripting',
 
-                               'Layout' => 'Layout',
-                               'UpdateLayoutTree' => 'Layout',
-                               'RecalculateStyles' => 'Layout',
-                               'ParseAuthorStyleSheet' => 'Layout',
-                               'ScheduleStyleRecalculation' => 'Layout',
                                'InvalidateLayout' => 'Layout',
+                               'Layout' => 'Layout',
+                               'ParseAuthorStyleSheet' => 'Layout',
+                               'RecalculateStyles' => 'Layout',
+                               'ScheduleStyleRecalculation' => 'Layout',
+                               'UpdateLayoutTree' => 'Layout',
 
-                               'Paint' => 'Painting',
-                               'DecodeImage' => 'Painting',
-                               'Decode Image' => 'Painting',
-                               'ResizeImage' => 'Painting',
                                'CompositeLayers' => 'Painting',
-                               'Rasterize' => 'Painting',
+                               'Decode Image' => 'Painting',
+                               'Decode LazyPixelRef' => 'Painting',
+                               'DecodeImage' => 'Painting',
+                               'Draw LazyPixelRef' => 'Painting',
+                               'GPUTask' => 'Painting',
+                               'ImageDecodeTask' => 'Painting',
+                               'largestContentfulPaint::Candidate' => 'Painting',
+                               'layerId' => 'Painting',
+                               'Paint' => 'Painting',
                                'PaintImage' => 'Painting',
                                'PaintSetup' => 'Painting',
-                               'ImageDecodeTask' => 'Painting',
-                               'GPUTask' => 'Painting',
+                               'PrePaint' => 'Painting',
+                               'Rasterize' => 'Painting',
+                               'ResizeImage' => 'Painting',
                                'SetLayerTreeId' => 'Painting',
-                               'layerId' => 'Painting',
                                'UpdateLayer' => 'Painting',
                                'UpdateLayerTree' => 'Painting',
-                               'Draw LazyPixelRef' => 'Painting',
-                               'Decode LazyPixelRef' => 'Painting',
 
+                               'CommitLoad' => 'Loading',
+                               'MarkDOMContent' => 'Loading',
+                               'MarkLoad' => 'Loading',
                                'ParseHTML' => 'Loading',
+                               'ResourceChangePriority' => 'Loading',
+                               'ResourceFetcher::requestResource' => 'Loading',
+                               'ResourceFetcher::WarnUnusedPreloads' => 'Loading',
+                               'ResourceFinish' => 'Loading',
                                'ResourceReceivedData' => 'Loading',
                                'ResourceReceiveResponse' => 'Loading',
                                'ResourceSendRequest' => 'Loading',
-                               'ResourceFinish' => 'Loading',
-                               'CommitLoad' => 'Loading',
 
                                'Idle' => 'Idle');
-              $groups = array('Scripting' => 0, 'Layout' => 0, 'Painting' => 0, 'Loading' => 0, 'Other' => 0, 'Idle' => 0);
-              $groupColors = array('Scripting' => '#f1c453',
+                $groups = array('Scripting' => 0, 'Layout' => 0, 'Painting' => 0, 'Loading' => 0, 'Other' => 0, 'Idle' => 0);
+                $groupColors = array('Scripting' => '#f1c453',
                                    'Layout' => '#9a7ee6',
                                    'Painting' => '#71b363',
                                    'Loading' => '#70a2e3',
                                    'Other' => '#f16161',
                                    'Idle' => '#cbd1d9');
-              if (!array_key_exists('Idle', $processing))
-                $processing['Idle'] = 0;
-              foreach ($processing as $type => $time) {
-                $group = 'Other';
-                if (array_key_exists($type, $mapping))
-                  $group = $mapping[$type];
-                $groups[$group] += $time;
-              }
+                if (!array_key_exists('Idle', $processing)) {
+                    $processing['Idle'] = 0;
+                }
+                foreach ($processing as $type => $time) {
+                    $group = 'Other';
+                    if (array_key_exists($type, $mapping)) {
+                        $group = $mapping[$type];
+                    } elseif (stripos($type, 'v8.') === 0) {
+                        $group = 'Scripting';
+                    }
+                    $groups[$group] += $time;
+                }
             }
             ?>
 
@@ -105,18 +119,17 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
                 <h2>Main-thread Processing</h2>
                 <p>Where the browser's main thread was busy, not including idle time waiting for resources <?php
                       echo " (<a href=\"/timeline/" . VER_TIMELINE . "timeline.php?test=$id&run=$run&cached=$cached\" title=\"View Chrome Dev Tools Timeline\">view timeline</a>)";
-                    ?>.</p>
+                ?>.</p>
             </div>
 
-            <?php include("testinfo_command-bar.inc"); ?>
 
             </div>
 
             <div id="result" class="results_body">
               <h3 class="hed_sub">Processing Breakdown</h3>
 
-          
-          
+
+
           <div class="breakdownFrame">
             <div class="breakdownFrame_item">
               <div id="pieGroups" ></div>
@@ -132,8 +145,8 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
 
           <p>All of the main-thread activity including idle (waiting for resources usually) <?php
                       echo " (<a href=\"/timeline/" . VER_TIMELINE . "timeline.php?test=$id&run=$run&cached=$cached\" title=\"View Chrome Dev Tools Timeline\">view timeline</a>)";
-                    ?>.</p>
-          
+            ?>.</p>
+
 
           <div class="breakdownFrame">
           <div class="breakdownFrame_item">
@@ -148,14 +161,14 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
           </div>
 
 
-            
+
         </div>
         <?php include('footer.inc'); ?>
         </div></div></div>
 
         <!--Load the AJAX API-->
-        <script type="text/javascript" src="//www.google.com/jsapi"></script>
-        <script type="text/javascript">
+        <script src="//www.google.com/jsapi"></script>
+        <script>
 
         // Load the Visualization API and the table package.
         google.load('visualization', '1', {'packages':['table', 'corechart']});
@@ -175,31 +188,31 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
             <?php
             $index = 0;
             if (isset($groups) && is_array($groups) && count($groups)) {
-              foreach($groups as $type => $time)
-              {
-                if ($type != 'Idle') {
-                  echo "groups.setValue($index, 0, '$type');\n";
-                  echo "groups.setValue($index, 1, $time);\n";
-                  $color = $groupColors[$type];
-                  echo "groupColors.push('$color');\n";
-                  $index++;
+                foreach ($groups as $type => $time) {
+                    if ($type != 'Idle') {
+                        echo "groups.setValue($index, 0, '$type');\n";
+                        echo "groups.setValue($index, 1, $time);\n";
+                        $color = $groupColors[$type];
+                        echo "groupColors.push('$color');\n";
+                        $index++;
+                    }
                 }
-              }
             }
             $index = 0;
             if (isset($processing) && is_array($processing) && count($processing)) {
-              foreach($processing as $type => $time) {
-                if ($type != 'Idle') {
-                  echo "events.setValue($index, 0, '$type');\n";
-                  echo "events.setValue($index, 1, $time);\n";
-                  $group = 'Other';
-                  if (array_key_exists($type, $mapping))
-                    $group = $mapping[$type];
-                  $color = $groupColors[$group];
-                  echo "eventColors.push('$color');\n";
-                  $index++;
+                foreach ($processing as $type => $time) {
+                    if ($type != 'Idle') {
+                        echo "events.setValue($index, 0, '$type');\n";
+                        echo "events.setValue($index, 1, $time);\n";
+                        $group = 'Other';
+                        if (array_key_exists($type, $mapping)) {
+                            $group = $mapping[$type];
+                        }
+                        $color = $groupColors[$group];
+                        echo "eventColors.push('$color');\n";
+                        $index++;
+                    }
                 }
-              }
             }
             ?>
             var viewGroups = new google.visualization.DataView(groups);
@@ -209,7 +222,6 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
             tableGroups.draw(viewGroups, {showRowNumber: false, sortColumn: 1, sortAscending: false});
 
             var pieGroups = new google.visualization.PieChart(document.getElementById('pieGroups'));
-            google.visualization.events.addListener(pieGroups, 'ready', function(){markUserTime('aft.Groups Pie');});
             pieGroups.draw(viewGroups, {width: 450, height: 300, title: 'Processing Categories', colors: groupColors});
 
 
@@ -220,7 +232,6 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
             tableEvents.draw(viewEvents, {showRowNumber: false, sortColumn: 1, sortAscending: false});
 
             var pieEvents = new google.visualization.PieChart(document.getElementById('pieEvents'));
-            google.visualization.events.addListener(pieEvents, 'ready', function(){markUserTime('aft.Events Pie');});
             pieEvents.draw(viewEvents, {width: 450, height: 300, title: 'Processing Events', colors: eventColors});
 
 
@@ -238,28 +249,27 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
             <?php
             $index = 0;
             if (isset($groups) && is_array($groups) && count($groups)) {
-              foreach($groups as $type => $time)
-              {
-                  echo "groupsIdle.setValue($index, 0, '$type');\n";
-                  echo "groupsIdle.setValue($index, 1, $time);\n";
-                  $color = $groupColors[$type];
-                  echo "groupColors.push('$color');\n";
-                  $index++;
-              }
+                foreach ($groups as $type => $time) {
+                    echo "groupsIdle.setValue($index, 0, '$type');\n";
+                    echo "groupsIdle.setValue($index, 1, $time);\n";
+                    $color = $groupColors[$type];
+                    echo "groupColors.push('$color');\n";
+                    $index++;
+                }
             }
             $index = 0;
             if (isset($processing) && is_array($processing) && count($processing)) {
-              foreach($processing as $type => $time)
-              {
-                  echo "eventsIdle.setValue($index, 0, '$type');\n";
-                  echo "eventsIdle.setValue($index, 1, $time);\n";
-                  $group = 'Other';
-                  if (array_key_exists($type, $mapping))
-                    $group = $mapping[$type];
-                  $color = $groupColors[$group];
-                  echo "eventColors.push('$color');\n";
-                  $index++;
-              }
+                foreach ($processing as $type => $time) {
+                    echo "eventsIdle.setValue($index, 0, '$type');\n";
+                    echo "eventsIdle.setValue($index, 1, $time);\n";
+                    $group = 'Other';
+                    if (array_key_exists($type, $mapping)) {
+                        $group = $mapping[$type];
+                    }
+                    $color = $groupColors[$group];
+                    echo "eventColors.push('$color');\n";
+                    $index++;
+                }
             }
             ?>
             var viewGroupsIdle = new google.visualization.DataView(groupsIdle);
@@ -286,21 +296,23 @@ $page_description = "Chrome main-thread processing breakdown$testLabel";
 </html>
 
 <?php
-function rgb2html($r, $g=-1, $b=-1)
+function rgb2html($r, $g = -1, $b = -1)
 {
-    if (is_array($r) && sizeof($r) == 3)
+    if (is_array($r) && sizeof($r) == 3) {
         list($r, $g, $b) = $r;
+    }
 
-    $r = intval($r); $g = intval($g);
+    $r = intval($r);
+    $g = intval($g);
     $b = intval($b);
 
-    $r = dechex($r<0?0:($r>255?255:$r));
-    $g = dechex($g<0?0:($g>255?255:$g));
-    $b = dechex($b<0?0:($b>255?255:$b));
+    $r = dechex($r < 0 ? 0 : ($r > 255 ? 255 : $r));
+    $g = dechex($g < 0 ? 0 : ($g > 255 ? 255 : $g));
+    $b = dechex($b < 0 ? 0 : ($b > 255 ? 255 : $b));
 
-    $color = (strlen($r) < 2?'0':'').$r;
-    $color .= (strlen($g) < 2?'0':'').$g;
-    $color .= (strlen($b) < 2?'0':'').$b;
-    return '#'.$color;
+    $color = (strlen($r) < 2 ? '0' : '') . $r;
+    $color .= (strlen($g) < 2 ? '0' : '') . $g;
+    $color .= (strlen($b) < 2 ? '0' : '') . $b;
+    return '#' . $color;
 }
 ?>

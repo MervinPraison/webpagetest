@@ -1,39 +1,69 @@
 # WebPageTest
 
-This is the official repository for the [WebPageTest](https://www.webpagetest.org/) web-performance testing code.
+This is the official repository for the performance-testing code that runs at [webpagetest.org](https://www.webpagetest.org).
 
-If you are looking to install your own instance, I recommend grabbing the latest [private instance release](https://docs.webpagetest.org/private-instances/).
+- 🥡 [Install your own instance](https://docs.webpagetest.org/private-instances/)
+- 📕 [Documentation](https://github.com/catchpoint/WebPageTest.docs)
+- 🌐 [Cross-platform browser agent](https://github.com/catchpoint/WebPageTest.agent)
+- 💤 [REST API](https://docs.webpagetest.org/api/) examples:
+  - 🐘 [`/bulktest`](/bulktest/): A PHP command-line tool that can submit a bulk set of tests, gather the results, and aggregate analyses.
+  - 🐍 [`/batchtool`](/batchtool/): A Python tool that can submit a bulk set of tests and gather the results.
 
-# Troubleshooting Private instances
+## Troubleshooting private instances
 
-If your instance is running, but you're having issues configuring agents, try navigating to {server_ip}/install and checking for a valid configuration.
+If your instance runs, but you’re having issues configuring agents, navigate to `http://{your_instance’s_ip}/install` to [check for a valid configuration](https://docs.webpagetest.org/private-instances/#web-server-install).
 
-# Agents
+## Testing
 
-The cross-platform browser agent is [here](https://github.com/WPO-Foundation/wptagent).
+WebPageTest uses [PHPUnit](https://phpunit.de) for unit tests. To set up and run the unit tests:
 
-# Documentation
+1. Install [Composer](https://getcomposer.org)
+2. Install [apcu](https://www.php.net/manual/en/book.apcu.php)
+3. Add the line `apc.enable_cli='on'` to your php.ini
+4. Run `composer install`
+5. Run `composer test`
 
-[WebPageTest Documentation](https://github.com/WPO-Foundation/webpagetest-docs)
+## Contributing
 
-# API Examples
+There are separate lines of development under different licenses (pull requests accepted to either):
 
-There are two examples using the [Restful API](https://docs.webpagetest.org/api/):
+- The `master` branch where most active development occurs has the [Polyform Shield 1.0.0 license](LICENSE.md)
+- The `apache` branch has the more permissive [Apache 2.0 license](https://opensource.org/licenses/Apache-2.0)
 
-- /bulktest - A php cli project that can submit a bulk set of tests, gather the results and aggregate analysis.
-- /batchtool - A python project that can submit a bulk set of tests and gather the results.
+### Code style
 
-# Contributing
+WebPageTest uses PSR12 coding conventions for PHP linting and formatting.
+For JavaScript and CSS formatting we use Prettier with its default configuration.
+Additionally we use Stylelint for CSS linting.
 
-There are 2 separate lies of development under different licenses and pull requests are accepted to either of them. The master branch where most active development is occurring is under the [Polyform Shield 1.0.0 license](LICENSE.md) and there is an "apache" branch which is under the more permissive Apache 2.0 license.
+Before you send a pull request please make sure to run: `composer lint && composer format`.
 
-## Testing the code
+Alternatively you can run
 
-WebPageTest uses [PHPUnit](https://phpunit.de/index.html) to run unit tests. In
-order to install PHPUnit and run the unit tests, you'll first need to install
-[Composer](https://getcomposer.org/). From there, you can run `composer install`
-and `composer test` to run the tests.
+ - `composer lint:php && composer format:php` if you only touched PHP code, or
+ - `composer lint:css && composer format:prettier` if you only touched CSS or JavaScript code
 
-# Change Log
+### VSCode integration
 
-View the [WebPageTest Change Log](https://docs.webpagetest.org/change-log)
+If you use VSCode you might find it helpful to install Prettier and PHP Intelephence plugins and use these in your "settings.json":
+
+```
+{
+  "[php]": {
+    "editor.tabSize": 4
+  },
+
+  // uncomment to reformat on every file save
+  //"editor.formatOnSave": true,
+
+  "phpcs.standard": "PSR12",
+
+  "files.trimTrailingWhitespace": true,
+
+  "files.eol": "\n",
+
+  "files.associations": {
+    "*.inc": "php"
+  }
+}
+```
